@@ -1,8 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { satteri } from '@astrojs/markdown-satteri';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { SITE_URL } from './src/consts.ts';
+import { externalLinks } from './src/markdown/external-links.js';
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,7 +16,28 @@ export default defineConfig({
   // 404 페이지는 자동으로 제외된다.
   integrations: [sitemap()],
 
+  image: {
+    /*
+     * 반응형 이미지를 전역으로 켠다.
+     * 마크다운의 ![alt](./경로) 이미지에도 srcset·sizes가 자동으로 붙어
+     * 화면 크기에 맞는 파일을 받는다.
+     *
+     * constrained — 컨테이너 폭까지 늘어나되 원본 크기를 넘지 않는다.
+     * 본문 폭(max-w-2xl)이 고정된 블로그에 맞는 동작.
+     */
+    layout: 'constrained',
+  },
+
   markdown: {
+    /*
+     * Sätteri는 Astro 7의 기본 처리기지만, 플러그인을 붙이려면 명시적으로
+     * 지정해야 한다. features를 비워두면 기본값(GFM·smart punctuation 등)이
+     * 그대로 유지된다.
+     */
+    processor: satteri({
+      hastPlugins: [externalLinks(SITE_URL)],
+    }),
+
     shikiConfig: {
       /*
        * 듀얼 테마. Shiki가 각 토큰에 라이트 색을 인라인 스타일로 넣고

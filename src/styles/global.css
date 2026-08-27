@@ -140,6 +140,17 @@
 }
 
 /*
+ * 본문 이미지.
+ *
+ * 스크린샷은 배경이 흰색인 경우가 많아 페이지 배경(#fdfcfa)에 섞여 경계가
+ * 사라진다. 코드블록과 같은 얇은 테두리를 줘서 도판임이 드러나게 한다.
+ */
+.prose :where(img):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid var(--rule);
+  border-radius: 0.375rem;
+}
+
+/*
  * 코드블록 테두리.
  *
  * Shiki가 라이트 테마 배경을 #fff로 넣는데 페이지 배경이 #fdfcfa라서
