@@ -33,7 +33,7 @@
 | 배포 | **Cloudflare Pages** — git push 시 자동 빌드 |
 | 언어·날짜 | `<html lang="ko">`, 날짜는 `2026년 8월 27일` |
 | 패키지 매니저 | npm |
-| **Node 버전** | **22.17.0** (`.nvmrc`로 고정). Astro 7이 `>=22.12.0`을 요구 — 머신 기본값 v20.19.3으로는 스캐폴딩부터 실패 |
+| **Node 버전** | **24.20.0** = Active LTS(Krypton), `.nvmrc`로 고정. Astro 7이 `>=22.12.0`, 하위 의존성 undici가 `>=22.19.0`을 요구 — 머신 기본값 v20.19.3으로는 스캐폴딩부터 실패. nvm `default` alias는 회사 작업용 `20`으로 그대로 둔다 |
 | git 저자 | **이 레포만** `kiwonbyun` / `bkw9603@gmail.com`. 전역 설정(회사 계정)은 건드리지 않는다 |
 
 **RSS 처리 주의**: 피드 자체는 생성하되(`/rss.xml`) 푸터·헤더에 링크를 노출하지 않는다. 단, `<head>`의 `<link rel="alternate" type="application/rss+xml">`은 넣는다 — 피드 리더의 자동 발견용이고 화면에는 보이지 않는다.
@@ -333,7 +333,7 @@ About은 무난한 초안 + `{/* 여기부터 직접 수정 */}` 주석.
   "assets": { "directory": "./dist" }
 }
 ```
-`README.md`에 대시보드 연동 설정값 기록: build command `npm run build`, output directory `dist`, **Node 22.12 이상**. Cloudflare Pages는 레포의 `.nvmrc`를 읽으므로 로컬과 CI 버전이 자동으로 일치한다. 그리고 "글 쓰는 방법"(md 추가 → frontmatter 형식 → push) 섹션.
+`README.md`에 대시보드 연동 설정값 기록: build command `npm run build`, output directory `dist`. **Node 버전은 별도 설정이 필요 없다** — Cloudflare Pages 빌드 이미지가 레포의 `.nvmrc`를 읽으므로 로컬과 CI가 자동으로 24.20.0으로 일치한다(빌드 이미지 기본값은 22.16.0이고 그보다 최신 버전도 허용). 그리고 "글 쓰는 방법"(md 추가 → frontmatter 형식 → push) 섹션.
 
 > **범위 경계**: 원격 리포지토리 생성, 첫 push, Cloudflare 프로젝트 연결은 외부에 공개되는 작업이라 **별도로 확인받고 진행한다.** 이 계획의 범위는 로컬에서 빌드가 통과하는 상태까지다.
 >
