@@ -5,17 +5,15 @@ import { AUTHOR, GITHUB_URL } from '../consts';
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-slate-200 dark:border-slate-800">
-  <div
-    class="mx-auto flex max-w-2xl items-center justify-between px-6 py-8 text-sm text-slate-500"
-  >
+<footer class="mt-24 border-t border-rule">
+  <div class="mx-auto flex max-w-2xl items-baseline justify-between px-6 py-8 text-xs text-faint">
     <p>&copy; {year} {AUTHOR}</p>
 
     <a
       href={GITHUB_URL}
       rel="noopener noreferrer"
       target="_blank"
-      class="hover:text-slate-900 dark:hover:text-slate-100"
+      class="transition-colors hover:text-ink"
     >
       GitHub
     </a>

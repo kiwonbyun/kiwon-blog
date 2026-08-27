@@ -7,9 +7,9 @@
 /** 배포 도메인. 끝에 슬래시를 붙이지 않는다 (경로를 이어 붙일 때 //가 된다). */
 export const SITE_URL = 'https://kiwon.pages.dev';
 
-export const SITE_TITLE = 'kiwon';
+export const SITE_TITLE = '변기원 블로그';
 export const SITE_DESCRIPTION = '개발 기록과 생각';
-export const AUTHOR = 'kiwon';
+export const AUTHOR = '변기원';
 
 /** 개인 계정 */
 export const GITHUB_URL = 'https://github.com/kiwonbyun';

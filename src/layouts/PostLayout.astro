@@ -21,36 +21,30 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
   publishedDate={pubDate}
   updatedDate={updatedDate}
 >
-  <article class="mx-auto max-w-2xl px-6 py-12">
-    <header>
-      <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
-
-      <div class="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
+  <article class="mx-auto max-w-2xl px-6 py-14">
+    {/*
+      기사 머리. 날짜(작게) → 제목(가장 크게) → 리드(중간) 순으로
+      크기를 계단처럼 떨어뜨려 읽는 순서를 만든다.
+    */}
+    <header class="border-b border-rule pb-10">
+      <div class="flex flex-wrap items-baseline gap-x-2 text-xs tracking-wide text-faint">
         <FormattedDate date={pubDate} />
-        {updatedDate && (
-          <span class="flex gap-1">
-            <span aria-hidden="true">·</span>
-            <span>수정 <FormattedDate date={updatedDate} /></span>
-          </span>
-        )}
+        {
+          updatedDate && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>
+                수정 <FormattedDate date={updatedDate} />
+              </span>
+            </>
+          )
+        }
       </div>
 
-      {
-        tags.length > 0 && (
-          <ul class="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
-            {tags.map((tag) => (
-              <li>
-                <a
-                  href={`/tags/${encodeURIComponent(tag)}/`}
-                  class="hover:text-slate-900 dark:hover:text-slate-100"
-                >
-                  #{tag}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      <h1 class="mt-3.5 text-[2.125rem] leading-[1.2] font-bold tracking-tight">{title}</h1>
+
+      {/* description을 리드 문단으로 승격시킨다. 목록 카드에서 쓰던 문장이 여기서 다시 쓰인다. */}
+      <p class="mt-4 text-lg leading-relaxed text-muted">{description}</p>
     </header>
 
     <TableOfContents headings={headings} />
@@ -59,8 +53,28 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
       max-w-none으로 prose의 기본 max-width(65ch)를 해제한다.
       바깥 컨테이너의 max-w-2xl을 따르게 해서 목록 페이지와 본문 폭을 맞춘다.
     */}
-    <div class="prose dark:prose-invert mt-10 max-w-none">
+    <div class="prose mt-12 max-w-none">
       <slot />
     </div>
+
+    {
+      /* 태그는 본문 뒤에 둔다. 다 읽은 뒤 관련 글로 넘어가는 자리다. */
+      tags.length > 0 && (
+        <footer class="mt-16 border-t border-rule pt-6">
+          <ul class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-faint">
+            {tags.map((tag) => (
+              <li>
+                <a
+                  href={`/tags/${encodeURIComponent(tag)}/`}
+                  class="transition-colors hover:text-ink"
+                >
+                  #{tag}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </footer>
+      )
+    }
   </article>
 </BaseLayout>

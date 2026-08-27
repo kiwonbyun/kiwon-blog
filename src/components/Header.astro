@@ -8,36 +8,40 @@ import { SITE_TITLE } from '../consts';
  */
 const links = [
   { href: '/', label: '홈' },
-  { href: '/tags', label: '태그' },
   { href: '/about', label: 'About' },
 ];
 
-/** 현재 경로 강조용. 끝 슬래시를 떼고 비교한다 (/tags/ vs /tags) */
+/** 현재 경로 강조용. 끝 슬래시를 떼고 비교한다 (/about/ vs /about) */
 const current = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
-<header class="border-b border-slate-200 dark:border-slate-800">
-  <div class="mx-auto flex max-w-2xl items-baseline justify-between px-6 py-5">
+<header class="border-b border-rule">
+  <div class="mx-auto flex max-w-2xl items-baseline justify-between px-6 py-7">
+    {/*
+      한글 이름이라 uppercase는 효과가 없고, 자간을 크게 벌리면
+      "변 기 원"처럼 글자가 흩어져 읽힌다.
+      대신 크기를 키우고 굵게 해서 마스트헤드 무게를 준다.
+    */}
     <a
       href="/"
-      class="text-lg font-bold tracking-tight hover:text-slate-500 dark:hover:text-slate-400"
+      class="text-base font-bold tracking-tight transition-colors hover:text-muted"
     >
       {SITE_TITLE}
     </a>
 
     <nav>
-      <ul class="flex gap-5 text-sm">
+      <ul class="flex gap-6 text-[0.8125rem]">
         {
           links.map(({ href, label }) => {
-            const isCurrent = current === href.replace(/\/$/, '') || (href === '/' && current === '/');
+            const isCurrent = current === href.replace(/\/$/, '');
             return (
               <li>
                 <a
                   href={href}
                   aria-current={isCurrent ? 'page' : undefined}
                   class:list={[
-                    'hover:text-slate-900 dark:hover:text-slate-100',
-                    isCurrent ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500',
+                    'transition-colors hover:text-ink',
+                    isCurrent ? 'text-ink' : 'text-muted',
                   ]}
                 >
                   {label}

@@ -11,9 +11,9 @@ const posts = await getPublishedPosts();
   <main class="mx-auto max-w-2xl px-6">
     {
       posts.length === 0 ? (
-        <p class="py-16 text-slate-500">아직 글이 없습니다.</p>
+        <p class="py-20 text-muted">아직 글이 없습니다.</p>
       ) : (
-        <ul class="divide-y divide-slate-200 dark:divide-slate-800">
+        <ul class="divide-y divide-rule">
           {posts.map((post) => (
             <li>
               <PostCard post={post} />

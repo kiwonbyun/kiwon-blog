@@ -26,33 +26,18 @@ export async function getPublishedPosts(): Promise<Post[]> {
   return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
 
-/** 태그 하나와 그 태그를 가진 글 수 */
-export interface TagCount {
-  tag: string;
-  count: number;
-}
-
 /**
- * 공개된 글에 쓰인 모든 태그를 중복 없이 모아 반환한다.
- * 글이 많은 태그가 먼저 오고, 개수가 같으면 이름 순으로 정렬한다.
+ * 공개된 글에 쓰인 태그를 중복 없이 이름 순으로 반환한다.
  *
  * 태그 페이지의 getStaticPaths가 이 목록으로 경로를 만든다.
  * 즉 아무 글도 달지 않은 태그는 페이지가 생기지 않는다.
  */
-export async function getAllTags(): Promise<TagCount[]> {
+export async function getAllTags(): Promise<string[]> {
   const posts = await getPublishedPosts();
+  const tags = new Set(posts.flatMap((post) => post.data.tags));
 
-  const counts = new Map<string, number>();
-  for (const post of posts) {
-    for (const tag of post.data.tags) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1);
-    }
-  }
-
-  return [...counts.entries()]
-    .map(([tag, count]) => ({ tag, count }))
-    // 한글 태그도 사전 순으로 정렬되도록 로케일을 지정한다.
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, 'ko'));
+  // 한글 태그도 사전 순으로 정렬되도록 로케일을 지정한다.
+  return [...tags].sort((a, b) => a.localeCompare(b, 'ko'));
 }
 
 /** 특정 태그를 가진 글만 최신순으로 반환한다. */

@@ -8,14 +8,17 @@ import { getAllTags, getPublishedPosts, type Post } from '../../utils/posts';
  *
  * params.tag에는 인코딩하지 않은 원문을 넣는다. Astro가 출력 경로를 만들 때
  * 알아서 처리하므로 한글 태그도 dist/tags/회고/index.html 로 생성된다.
- * 링크 쪽(PostCard·tags/index)에서 encodeURIComponent를 쓰면
- * 브라우저가 %EC%9D%B4... 로 요청하고 서버가 디코딩해 이 파일을 찾는다.
+ * 링크 쪽(PostCard·PostLayout)에서 encodeURIComponent를 쓰면
+ * 브라우저가 %ED%9A%8C%EA%B3%A0 로 요청하고 서버가 디코딩해 이 파일을 찾는다.
+ *
+ * 태그 목록 페이지는 두지 않는다. 태그 페이지로는 글에 달린 태그를 눌러
+ * 들어오는 경로만 있다.
  */
 export async function getStaticPaths() {
   const tags = await getAllTags();
   const posts = await getPublishedPosts();
 
-  return tags.map(({ tag }) => ({
+  return tags.map((tag) => ({
     params: { tag },
     props: {
       tag,
@@ -33,11 +36,14 @@ const { tag, posts } = Astro.props;
 ---
 
 <BaseLayout title={`#${tag}`} description={`${tag} 태그가 달린 글 ${posts.length}개`}>
-  <main class="mx-auto max-w-2xl px-6 py-10">
-    <h1 class="text-2xl font-bold tracking-tight">#{tag}</h1>
-    <p class="mt-1 text-sm text-slate-500">글 {posts.length}개</p>
+  <main class="mx-auto max-w-2xl px-6">
+    <header class="border-b border-rule pt-14 pb-8">
+      <p class="text-[0.6875rem] tracking-[0.18em] text-faint uppercase">태그</p>
+      <h1 class="mt-2.5 text-3xl font-bold tracking-tight">#{tag}</h1>
+      <p class="mt-2 text-sm text-muted">글 {posts.length}개</p>
+    </header>
 
-    <ul class="mt-4 divide-y divide-slate-200 dark:divide-slate-800">
+    <ul class="divide-y divide-rule">
       {
         posts.map((post) => (
           <li>
@@ -46,11 +52,5 @@ const { tag, posts } = Astro.props;
         ))
       }
     </ul>
-
-    <p class="mt-8 text-sm">
-      <a href="/tags/" class="text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">
-        ← 전체 태그
-      </a>
-    </p>
   </main>
 </BaseLayout>

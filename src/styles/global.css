@@ -1,35 +1,110 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/*
+ * 색 체계.
+ *
+ * @theme의 색을 :root 변수로 한 번 우회시키는 이유 —
+ * @theme은 정적이라 다크모드에서 값을 바꿀 수 없다. 이렇게 두면
+ * bg-paper / text-ink 같은 유틸리티가 미디어쿼리에 따라 알아서 바뀌므로
+ * 컴포넌트마다 dark: 접두사를 중복해서 붙일 필요가 없다.
+ *
+ * 팔레트는 파란빛이 도는 slate 대신 따뜻한 무채색을 쓴다.
+ * 인쇄물의 종이·잉크에 가까운 인상을 만들고, 색을 절제하는 대신
+ * 위계는 크기·여백·굵기로 만든다.
+ */
 @theme {
-  /*
-   * Tailwind 기본 시스템 폰트 스택을 Pretendard로 교체한다.
-   * Preflight가 html에 font-family: var(--default-font-family)를 걸고
-   * --default-font-family는 --font-sans를 참조하므로,
-   * 이 한 줄로 문서 전체와 prose 본문이 동시에 적용된다.
-   *
-   * dynamic subset은 preload가 불가능해(빌드 타임에 필요한 조각을 알 수 없음)
-   * 폰트 도착 전 fallback이 실제로 보인다. 한글 시스템 폰트를 앞에 둬서
-   * 교체 시점의 글자 폭 차이를 줄인다.
-   */
   --font-sans: 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-rule: var(--rule);
 }
 
-/*
- * 인라인 코드 배경색.
- * @theme이 아니라 :root에 두는 이유 — Tailwind 4는 사용되지 않은 @theme 변수를
- * tree-shake하므로, CSS에서만 var()로 참조하면 정의가 빠질 수 있다.
- * 값은 Tailwind 팔레트의 slate-100 / slate-800.
- */
 :root {
-  --inline-code-bg: oklch(96.8% 0.007 247.896);
+  --paper: #fdfcfa; /* 순백보다 살짝 따뜻하게 */
+  --ink: #1c1917;
+  --muted: #6b6560; /* 날짜·메타 */
+  --faint: #a8a29e; /* 더 약한 보조 텍스트 */
+  --rule: #e7e5e4; /* 얇은 구분선 */
+  --inline-code-bg: #f2f1ef;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --inline-code-bg: oklch(27.9% 0.041 260.031);
+    --paper: #191817;
+    --ink: #f0efec;
+    --muted: #a8a29e;
+    --faint: #78716c;
+    --rule: #2b2927;
+    --inline-code-bg: #262422;
   }
+}
+
+/*
+ * 본문 활자.
+ *
+ * 기본 16px/1.75보다 조금 키우고 행간을 넓힌다. 한글은 라틴보다 글자가
+ * 촘촘해 같은 크기에서 더 답답하게 읽힌다.
+ * prose 색도 typography 기본값(slate 계열) 대신 위 팔레트로 맞춘다.
+ */
+.prose {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+
+  --tw-prose-body: var(--ink);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-links: var(--ink);
+  --tw-prose-quotes: var(--muted);
+  --tw-prose-quote-borders: var(--rule);
+  --tw-prose-hr: var(--rule);
+  --tw-prose-counters: var(--faint);
+  --tw-prose-bullets: var(--rule);
+  --tw-prose-captions: var(--faint);
+  --tw-prose-th-borders: var(--rule);
+  --tw-prose-td-borders: var(--rule);
+}
+
+/* 제목 위 여백을 키워 섹션이 눈에 띄게 끊기도록 한다. */
+.prose :where(h2):not(:where([class~="not-prose"] *)) {
+  margin-top: 2.75em;
+  font-size: 1.35em;
+  letter-spacing: -0.01em;
+}
+
+.prose :where(h3):not(:where([class~="not-prose"] *)) {
+  margin-top: 2em;
+  font-size: 1.1em;
+}
+
+/* 본문 링크는 색이 아니라 얇은 밑줄로 구분한다. */
+.prose :where(a):not(:where([class~="not-prose"] *)) {
+  font-weight: 400;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--faint);
+  transition: text-decoration-color 150ms;
+}
+
+.prose :where(a):not(:where([class~="not-prose"] *)):hover {
+  text-decoration-color: var(--ink);
+}
+
+/* 인용문의 장식 따옴표를 없애고 좌측 규칙선만 남긴다. */
+.prose :where(blockquote):not(:where([class~="not-prose"] *)) {
+  font-style: normal;
+  font-weight: 400;
+  padding-inline-start: 1.25em;
+}
+
+.prose :where(blockquote p:first-of-type):not(:where([class~="not-prose"] *))::before,
+.prose :where(blockquote p:last-of-type):not(:where([class~="not-prose"] *))::after {
+  content: none;
 }
 
 /*
@@ -46,12 +121,11 @@
   content: none;
 }
 
-/* typography 기본값은 색과 굵기만 바꿔서 본문과 잘 구분되지 않는다.
-   배경과 패딩을 줘 코드임이 드러나게 한다. */
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   background-color: var(--inline-code-bg);
   border-radius: 0.25rem;
   padding: 0.125em 0.375em;
+  font-size: 0.9em;
   font-weight: 500;
 }
 
@@ -62,6 +136,21 @@
   border-radius: 0;
   padding: 0;
   font-weight: inherit;
+  font-size: inherit;
+}
+
+/*
+ * 코드블록 테두리.
+ *
+ * Shiki가 라이트 테마 배경을 #fff로 넣는데 페이지 배경이 #fdfcfa라서
+ * 둘의 차이가 거의 없어 블록 경계가 보이지 않는다.
+ * 배경을 덮어쓰면 하이라이팅 테마와 어긋나므로 얇은 테두리로 경계를 만든다.
+ */
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid var(--rule);
+  border-radius: 0.375rem;
+  font-size: 0.875em;
+  line-height: 1.7;
 }
 
 /*

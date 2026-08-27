@@ -72,7 +72,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE_URL);
   </head>
 
   {/* flex + min-h-screen: 글이 짧아도 푸터가 화면 하단에 붙는다 */}
-  <body class="flex min-h-screen flex-col bg-white text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
+  <body class="flex min-h-screen flex-col bg-paper text-ink antialiased">
     <Header />
     <div class="flex-1">
       <slot />
