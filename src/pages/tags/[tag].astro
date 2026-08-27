@@ -36,7 +36,7 @@ const { tag, posts } = Astro.props;
 ---
 
 <BaseLayout title={`#${tag}`} description={`${tag} 태그가 달린 글 ${posts.length}개`}>
-  <main class="mx-auto max-w-2xl px-6">
+  <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6">
     <header class="border-b border-rule pt-14 pb-8">
       <p class="text-[0.6875rem] tracking-[0.18em] text-faint uppercase">태그</p>
       <h1 class="mt-2.5 text-3xl font-bold tracking-tight">#{tag}</h1>

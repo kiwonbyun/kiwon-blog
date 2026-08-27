@@ -57,9 +57,9 @@ git config는 `--local`로 설정하므로 전역 회사 설정에 영향이 없
 
 
 **아직 미정 (구현을 막지 않음)**
-- **도메인** — `src/consts.ts`의 `SITE_URL` 한 줄. 임시로 `https://kiwon.pages.dev`를 넣고 확정 시 교체
+- **도메인** — `src/consts.ts`의 `SITE_URL` 한 줄. 임시로 `https://kiwon-blog.pages.dev`를 넣고 확정 시 교체
 - **About 본문 문구** — 무난한 초안을 넣고 직접 고치도록 주석 표시. 자기소개는 대신 쓸 수 없는 영역
-- **Cloudflare 프로젝트명** — 기본은 `log-storage`(레포명). 배포 단계에서 확정
+- **Cloudflare 프로젝트명** — `kiwon-blog`. 프로젝트명이 곧 서브도메인이므로 배포 URL은 `kiwon-blog.pages.dev`가 된다
 
 ---
 
@@ -91,7 +91,7 @@ Sätteri 내장 기능 덕에 목차·GFM 테이블·heading 앵커를 위한 �
 ## 디렉토리 구조
 
 ```
-log-storage/
+kiwon-blog/
 ├── astro.config.mjs
 ├── package.json
 ├── tsconfig.json
@@ -331,7 +331,7 @@ About은 무난한 초안 + `{/* 여기부터 직접 수정 */}` 주석.
 `wrangler.jsonc`:
 ```jsonc
 {
-  "name": "log-storage",
+  "name": "kiwon-blog",
   "compatibility_date": "2026-08-27",
   "assets": { "directory": "./dist" }
 }

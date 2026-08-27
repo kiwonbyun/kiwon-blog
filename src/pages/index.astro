@@ -8,7 +8,7 @@ const posts = await getPublishedPosts();
 
 {/* 홈은 글 목록만. 인트로·히어로를 두지 않기로 했다. */}
 <BaseLayout>
-  <main class="mx-auto max-w-2xl px-6">
+  <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6">
     {
       posts.length === 0 ? (
         <p class="py-20 text-muted">아직 글이 없습니다.</p>
