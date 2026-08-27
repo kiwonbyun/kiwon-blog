@@ -40,6 +40,12 @@ import '../styles/global.css';
 					<code>--font-sans</code>가 상속되는지 확인한다.
 				</p>
 				<blockquote>인용문 — 글자 폭과 행간이 읽기 좋게 잡히는지.</blockquote>
+				<p>
+					인라인 코드에 백틱이 안 보이고 배경이 있어야 한다:
+					<code>npm run build</code>, <code>--font-sans</code>
+				</p>
+				<pre><code>{`// 코드블록 안의 code는 배경/패딩이 없어야 한다
+const posts = await getCollection('posts');`}</code></pre>
 			</article>
 		</main>
 	</body>

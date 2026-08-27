@@ -15,3 +15,51 @@
   --font-sans: 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
 }
+
+/*
+ * 인라인 코드 배경색.
+ * @theme이 아니라 :root에 두는 이유 — Tailwind 4는 사용되지 않은 @theme 변수를
+ * tree-shake하므로, CSS에서만 var()로 참조하면 정의가 빠질 수 있다.
+ * 값은 Tailwind 팔레트의 slate-100 / slate-800.
+ */
+:root {
+  --inline-code-bg: oklch(96.8% 0.007 247.896);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --inline-code-bg: oklch(27.9% 0.041 260.031);
+  }
+}
+
+/*
+ * 아래 규칙들은 의도적으로 @layer 밖에 둔다.
+ * typography의 .prose 규칙이 @layer utilities에 들어가기 때문에,
+ * @layer components에 쓰면 우선순위에서 밀려 무시된다.
+ * layer에 속하지 않은 CSS는 모든 layer보다 우선한다.
+ */
+
+/* typography는 인라인 코드 앞뒤에 백틱을 삽입한다.
+   마크다운 원문 문법이 렌더 결과에 새는 것이므로 제거. */
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
+  content: none;
+}
+
+/* typography 기본값은 색과 굵기만 바꿔서 본문과 잘 구분되지 않는다.
+   배경과 패딩을 줘 코드임이 드러나게 한다. */
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: var(--inline-code-bg);
+  border-radius: 0.25rem;
+  padding: 0.125em 0.375em;
+  font-weight: 500;
+}
+
+/* 코드블록 내부의 code는 위 배경을 물려받으면 안 된다.
+   블록 자체 배경(Shiki 테마)을 쓰도록 되돌린다. */
+.prose :where(pre code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  font-weight: inherit;
+}
