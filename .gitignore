@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# 티스토리 가져오기 작업 파일 (import-tistory 스킬)
+.import-tistory/
