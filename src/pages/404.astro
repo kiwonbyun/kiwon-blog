@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+/*
+ * 정적 빌드에서 dist/404.html로 생성된다.
+ * Cloudflare Pages는 경로 매칭에 실패하면 이 파일을 자동으로 응답하므로
+ * 별도 설정이 필요 없다.
+ */
+---
+
+<BaseLayout title="페이지를 찾을 수 없습니다">
+  <main class="mx-auto max-w-2xl px-6 py-24 text-center">
+    <p class="text-5xl font-bold tracking-tight text-slate-300 dark:text-slate-700">404</p>
+    <h1 class="mt-4 text-xl font-bold tracking-tight">페이지를 찾을 수 없습니다</h1>
+    <p class="mt-2 text-slate-500">주소가 바뀌었거나 삭제된 글일 수 있습니다.</p>
+
+    <p class="mt-8">
+      <a
+        href="/"
+        class="text-sm text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-slate-900 dark:text-slate-400 dark:decoration-slate-600 dark:hover:text-slate-100"
+      >
+        글 목록으로 돌아가기
+      </a>
+    </p>
+  </main>
+</BaseLayout>

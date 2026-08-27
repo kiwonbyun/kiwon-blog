@@ -9,6 +9,22 @@ export default defineConfig({
   // 이 값이 없으면 Astro.site가 undefined가 되어 meta 태그가 상대경로로 나간다.
   site: SITE_URL,
 
+  markdown: {
+    shikiConfig: {
+      /*
+       * 듀얼 테마. Shiki가 각 토큰에 라이트 색을 인라인 스타일로 넣고
+       * 다크 색은 --shiki-dark 커스텀 속성으로 함께 넣는다.
+       * 실제 전환은 global.css의 미디어쿼리가 그 변수를 꺼내 쓰는 방식이라
+       * 클라이언트 JS가 필요 없다.
+       */
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+      wrap: false,
+    },
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

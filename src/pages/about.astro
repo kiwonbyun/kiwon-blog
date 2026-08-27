@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GITHUB_URL } from '../consts';
+---
+
+<BaseLayout title="About" description="이 블로그와 글쓴이에 대해">
+  <main class="mx-auto max-w-2xl px-6 py-10">
+    <h1 class="text-2xl font-bold tracking-tight">About</h1>
+
+    {/* ───── 여기부터 직접 고쳐 쓰세요. 아래는 자리를 채워둔 초안입니다. ───── */}
+    <div class="prose dark:prose-invert mt-6 max-w-none">
+      <p>
+        개발하면서 알게 된 것과 그때 한 판단을 남기는 곳입니다. 나중에 같은 문제를 다시
+        만났을 때 과거의 내가 왜 그렇게 했는지 알 수 있도록 쓰고 있습니다.
+      </p>
+
+      <p>
+        주로 웹 프론트엔드와 그 주변을 다룹니다. 잘 정리된 결론보다 막혔던 지점과 그걸
+        어떻게 넘었는지에 관심이 많습니다.
+      </p>
+
+      <h2>이 블로그에 대해</h2>
+
+      <p>
+        Astro로 만든 정적 사이트입니다. 데이터베이스 없이 마크다운 파일을 깃 저장소에
+        올리는 방식으로 글을 관리하고, 모든 페이지는 빌드 시점에 완성된 HTML로 만들어져
+        Cloudflare에서 서비스됩니다.
+      </p>
+
+      <p>
+        코드는 <a href={GITHUB_URL}>GitHub</a>에 있습니다.
+      </p>
+    </div>
+    {/* ───── 여기까지 ───── */}
+  </main>
+</BaseLayout>

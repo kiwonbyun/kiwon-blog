@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTags } from '../../utils/posts';
+
+const tags = await getAllTags();
+---
+
+<BaseLayout title="태그" description="글에 쓰인 태그 목록">
+  <main class="mx-auto max-w-2xl px-6 py-10">
+    <h1 class="text-2xl font-bold tracking-tight">태그</h1>
+
+    {
+      tags.length === 0 ? (
+        <p class="mt-6 text-slate-500">아직 태그가 없습니다.</p>
+      ) : (
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {tags.map(({ tag, count }) => (
+            <li>
+              <a
+                href={`/tags/${encodeURIComponent(tag)}/`}
+                class="inline-flex items-baseline gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500"
+              >
+                <span>#{tag}</span>
+                <span class="text-xs text-slate-500">{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </main>
+</BaseLayout>

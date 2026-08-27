@@ -63,3 +63,21 @@
   padding: 0;
   font-weight: inherit;
 }
+
+/*
+ * Shiki 듀얼 테마 전환.
+ *
+ * Shiki는 라이트 색을 인라인 style로 넣고, 다크 색은 같은 요소의
+ * --shiki-dark / --shiki-dark-bg 커스텀 속성에 담아둔다.
+ * OS가 다크일 때 그 변수를 꺼내 색을 덮어쓰면 전환이 끝난다.
+ *
+ * !important가 필요한 이유 — Shiki가 넣는 값이 인라인 style이라
+ * 선택자 명시도로는 이길 수 없다.
+ */
+@media (prefers-color-scheme: dark) {
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}

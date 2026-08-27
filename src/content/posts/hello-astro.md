@@ -2,7 +2,7 @@
 title: '파일만으로 블로그를 만든다'
 description: '데이터베이스 없이 마크다운 파일과 깃만으로 개인 블로그를 굴리는 구조에 대해.'
 pubDate: 2026-08-27
-tags: ['astro', 'blog']
+tags: ['astro', 'blog', '회고']
 draft: false
 ---
 
@@ -16,4 +16,25 @@ draft: false
 글도 되살릴 수 있고, 글을 고친 이력이 그대로 남는다.
 
 무결성은 스키마로 지킨다. 프론트매터에 오타가 있거나 필수 항목이 빠지면 빌드가 실패하므로
-잘못된 글이 배포될 일이 없다. 데이터베이스 제약 조건이 하던 일을 타입 검사기가 대신하는 셈이다.
+잘못된 글이 배포될 일이 없다.
+
+```ts
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
+  schema: z.object({
+    title: z.string(),
+    pubDate: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+```
+
+### 타입까지 따라온다
+
+이 스키마에서 타입이 자동 생성되므로 `post.data.title`에 자동완성이 붙고, 오타는
+편집기가 먼저 잡아준다. 데이터베이스 제약 조건이 하던 일을 타입 검사기가 대신하는 셈이다.
+
+## 배포는 밀어 넣는 것으로 끝난다
+
+새 글을 쓰고 커밋한 다음 원격에 밀어 넣으면 빌드가 돌고 결과물이 경계 서버에 퍼진다.
+운영 부담이 거의 없다는 점이 개인 블로그에서 가장 중요한 조건이라고 생각한다.
