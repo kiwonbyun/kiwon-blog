@@ -19,7 +19,6 @@ export async function getPublishedPosts(): Promise<Post[]> {
     // 프로덕션 빌드에서만 걸러내므로 배포물에는 초안이 들어가지 않는다.
     import.meta.env.PROD ? !data.draft : true,
   );
-  console.log(posts)
 
   // pubDate가 z.coerce.date()로 Date이므로 valueOf()로 바로 비교된다.
   // 문자열이었다면 파싱을 거쳐야 했다.
