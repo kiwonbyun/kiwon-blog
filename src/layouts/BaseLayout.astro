@@ -71,7 +71,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE_URL);
     <meta name="twitter:description" content={description} />
   </head>
 
-  {/* flex + min-h-screen: 글이 짧아도 푸터가 화면 하단에 붙는다 */}
   <body class="flex min-h-screen flex-col bg-paper text-ink antialiased">
     <Header />
     <div class="flex-1">

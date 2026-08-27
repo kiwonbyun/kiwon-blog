@@ -1,0 +1,14 @@
+{
+  // Cloudflare CLI(wrangler)로 직접 배포할 때 쓰는 설정.
+  // 대시보드에서 깃 저장소를 연결해 쓰는 경우에는 이 파일이 필요하지 않다.
+  //
+  //   npm run build && npx wrangler deploy
+  //
+  // 정적 사이트라 어댑터가 필요 없다. dist를 정적 자산으로 올리는 것이 전부다.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "log-storage",
+  "compatibility_date": "2026-08-27",
+  "assets": {
+    "directory": "./dist"
+  }
+}
