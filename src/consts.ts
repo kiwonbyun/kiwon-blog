@@ -5,7 +5,7 @@
  */
 
 /** 배포 도메인. 끝에 슬래시를 붙이지 않는다 (경로를 이어 붙일 때 //가 된다). */
-export const SITE_URL = 'https://kiwon-blog.pages.dev';
+export const SITE_URL = 'https://kiwon-blog.bkw9603.workers.dev';
 
 export const SITE_TITLE = '변기원 블로그';
 export const SITE_DESCRIPTION = '개발 기록과 생각';
