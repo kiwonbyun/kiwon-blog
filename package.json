@@ -25,6 +25,7 @@
     "esbuild": true
   },
   "devDependencies": {
-    "pretendard": "^1.3.9"
+    "pretendard": "^1.3.9",
+    "wrangler": "^4.127.0"
   }
 }
