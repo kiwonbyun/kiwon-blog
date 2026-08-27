@@ -1,0 +1,36 @@
+---
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import { TZDate } from '@date-fns/tz';
+import { TIME_ZONE } from '../consts';
+
+interface Props {
+  date: Date;
+  class?: string;
+}
+
+const { date, class: className } = Astro.props;
+
+/*
+ * 날짜를 직접 다루지 않고 date-fns에 맡기는 이유.
+ *
+ * frontmatter의 `pubDate: 2026-08-27`은 UTC 자정으로 파싱된다. 이를 그대로
+ * 포맷하면 빌드 머신의 시간대에 따라 결과가 달라진다 — 로컬(KST)과
+ * Cloudflare(UTC)에서 다른 날짜가 나올 수 있다.
+ *
+ * TZDate로 감싸면 이후 모든 format이 지정 시간대의 벽시계 시간을 기준으로
+ * 동작한다. 어디서 빌드해도 한국 기준 날짜가 나온다.
+ *
+ * 시간까지 적은 경우(예: 2026-08-27T20:00:00Z)에는 KST로 8월 28일이 되는데,
+ * 그게 한국 기준으로 옳은 표기다.
+ */
+const kst = new TZDate(date, TIME_ZONE);
+
+/** 화면용 — 2026년 8월 27일 */
+const label = format(kst, 'yyyy년 M월 d일', { locale: ko });
+
+/** <time> 태그의 machine-readable 값. 한국 기준 날짜여야 화면과 일치한다. */
+const iso = format(kst, 'yyyy-MM-dd');
+---
+
+<time datetime={iso} class={className}>{label}</time>

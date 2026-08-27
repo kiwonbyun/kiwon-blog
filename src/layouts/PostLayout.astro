@@ -1,0 +1,66 @@
+---
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import type { Post } from '../utils/posts';
+
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+}
+
+const { post, headings } = Astro.props;
+const { title, description, pubDate, updatedDate, tags } = post.data;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishedDate={pubDate}
+  updatedDate={updatedDate}
+>
+  <article class="mx-auto max-w-2xl px-6 py-12">
+    <header>
+      <h1 class="text-3xl font-bold tracking-tight">{title}</h1>
+
+      <div class="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-slate-500">
+        <FormattedDate date={pubDate} />
+        {updatedDate && (
+          <span class="flex gap-1">
+            <span aria-hidden="true">·</span>
+            <span>수정 <FormattedDate date={updatedDate} /></span>
+          </span>
+        )}
+      </div>
+
+      {
+        tags.length > 0 && (
+          <ul class="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+            {tags.map((tag) => (
+              <li>
+                <a
+                  href={`/tags/${encodeURIComponent(tag)}/`}
+                  class="hover:text-slate-900 dark:hover:text-slate-100"
+                >
+                  #{tag}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <TableOfContents headings={headings} />
+
+    {/*
+      max-w-none으로 prose의 기본 max-width(65ch)를 해제한다.
+      바깥 컨테이너의 max-w-2xl을 따르게 해서 목록 페이지와 본문 폭을 맞춘다.
+    */}
+    <div class="prose dark:prose-invert mt-10 max-w-none">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

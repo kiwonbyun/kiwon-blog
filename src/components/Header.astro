@@ -1,0 +1,52 @@
+---
+import { SITE_TITLE } from '../consts';
+
+/*
+ * RSS 링크는 의도적으로 넣지 않는다.
+ * 피드는 생성하되 화면에 노출하지 않기로 했고,
+ * 발견은 BaseLayout의 <link rel="alternate">가 담당한다.
+ */
+const links = [
+  { href: '/', label: '홈' },
+  { href: '/tags', label: '태그' },
+  { href: '/about', label: 'About' },
+];
+
+/** 현재 경로 강조용. 끝 슬래시를 떼고 비교한다 (/tags/ vs /tags) */
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="border-b border-slate-200 dark:border-slate-800">
+  <div class="mx-auto flex max-w-2xl items-baseline justify-between px-6 py-5">
+    <a
+      href="/"
+      class="text-lg font-bold tracking-tight hover:text-slate-500 dark:hover:text-slate-400"
+    >
+      {SITE_TITLE}
+    </a>
+
+    <nav>
+      <ul class="flex gap-5 text-sm">
+        {
+          links.map(({ href, label }) => {
+            const isCurrent = current === href.replace(/\/$/, '') || (href === '/' && current === '/');
+            return (
+              <li>
+                <a
+                  href={href}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  class:list={[
+                    'hover:text-slate-900 dark:hover:text-slate-100',
+                    isCurrent ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500',
+                  ]}
+                >
+                  {label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

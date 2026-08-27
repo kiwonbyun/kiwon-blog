@@ -1,0 +1,43 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+/*
+ * h2·h3만 쓴다.
+ * h1은 글 제목이 이미 페이지 상단에 있어 중복이고,
+ * h4 이하까지 넣으면 목차가 본문만큼 길어진다.
+ *
+ * slug는 Sätteri(Astro 7의 기본 마크다운 처리기)가 자동 생성한다.
+ * heading ID 생성이 내장이라 rehype-slug 같은 플러그인이 필요 없다.
+ */
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  /* 항목이 하나뿐이면 목차가 정보를 주지 않으므로 숨긴다. */
+  toc.length > 1 && (
+    <nav
+      aria-label="목차"
+      class="mt-8 rounded-lg border border-slate-200 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800/40"
+    >
+      <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">목차</p>
+      <ul class="mt-2 space-y-1 text-sm">
+        {toc.map((h) => (
+          <li class={h.depth === 3 ? 'ml-4' : ''}>
+            <a
+              href={`#${h.slug}`}
+              class="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            >
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
