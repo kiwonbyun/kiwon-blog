@@ -1,17 +1,32 @@
 ---
-
+import '../styles/global.css';
 ---
 
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Tailwind 동작 확인</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+		<main class="mx-auto max-w-2xl px-6 py-16">
+			<!-- Tailwind 유틸리티 검증 -->
+			<h1 class="text-3xl font-bold tracking-tight">Tailwind 유틸리티</h1>
+			<p class="mt-2 text-sm text-slate-500">이 문단이 작고 회색이면 유틸리티가 먹은 것.</p>
+
+			<!-- typography 플러그인 검증: prose 안의 요소는 클래스 없이도 스타일이 붙어야 함 -->
+			<article class="prose dark:prose-invert mt-10">
+				<h2>typography 플러그인</h2>
+				<p>이 영역은 <code>prose</code>로 감싸져 있다. 아래 요소들에 클래스를 하나도 주지 않았는데 스타일이 붙는다면 플러그인이 로드된 것이다.</p>
+				<ul>
+					<li>목록 항목에 여백과 불릿</li>
+					<li><a href="#">링크에 색과 밑줄</a></li>
+				</ul>
+				<blockquote>인용문에 좌측 보더와 이탤릭.</blockquote>
+				<pre><code>코드 블록에 배경색</code></pre>
+			</article>
+		</main>
 	</body>
 </html>
