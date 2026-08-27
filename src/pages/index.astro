@@ -1,4 +1,9 @@
 ---
+// 폰트 CSS는 global.css 안에서 @import 하지 않는다.
+// Tailwind가 @import를 인라인하면서 url(./woff2-dynamic-subset/...) 상대경로가
+// global.css 기준으로 재해석돼 깨질 수 있다. Vite가 각 CSS를 독립 처리하도록 분리.
+// (5단계에서 BaseLayout.astro로 이동 예정)
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import '../styles/global.css';
 ---
 
@@ -8,24 +13,33 @@ import '../styles/global.css';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Tailwind 동작 확인</title>
+		<title>폰트 · Tailwind 동작 확인</title>
 	</head>
 	<body class="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
 		<main class="mx-auto max-w-2xl px-6 py-16">
-			<!-- Tailwind 유틸리티 검증 -->
-			<h1 class="text-3xl font-bold tracking-tight">Tailwind 유틸리티</h1>
-			<p class="mt-2 text-sm text-slate-500">이 문단이 작고 회색이면 유틸리티가 먹은 것.</p>
+			<h1 class="text-3xl font-bold tracking-tight">Pretendard 적용 확인</h1>
+			<p class="mt-2 text-sm text-slate-500">
+				body에 font-sans 클래스를 주지 않았다. @theme의 --font-sans만 바꿨는데 적용되면 성공.
+			</p>
 
-			<!-- typography 플러그인 검증: prose 안의 요소는 클래스 없이도 스타일이 붙어야 함 -->
+			<!-- 가변 폰트 확인: 45~920 범위이므로 어느 굵기든 추가 다운로드가 없다 -->
+			<section class="mt-10 space-y-1">
+				<h2 class="text-sm text-slate-500">가변 굵기 (한 조각으로 전부 커버)</h2>
+				<p class="font-light">300 — 다람쥐 헌 쳇바퀴에 타고파 0123</p>
+				<p class="font-normal">400 — 다람쥐 헌 쳇바퀴에 타고파 0123</p>
+				<p class="font-semibold">600 — 다람쥐 헌 쳇바퀴에 타고파 0123</p>
+				<p class="font-bold">700 — 다람쥐 헌 쳇바퀴에 타고파 0123</p>
+				<p class="font-black">900 — 다람쥐 헌 쳇바퀴에 타고파 0123</p>
+			</section>
+
+			<!-- 한글/영문/숫자 혼용: 서로 다른 unicode-range 조각을 요청하게 된다 -->
 			<article class="prose dark:prose-invert mt-10">
-				<h2>typography 플러그인</h2>
-				<p>이 영역은 <code>prose</code>로 감싸져 있다. 아래 요소들에 클래스를 하나도 주지 않았는데 스타일이 붙는다면 플러그인이 로드된 것이다.</p>
-				<ul>
-					<li>목록 항목에 여백과 불릿</li>
-					<li><a href="#">링크에 색과 밑줄</a></li>
-				</ul>
-				<blockquote>인용문에 좌측 보더와 이탤릭.</blockquote>
-				<pre><code>코드 블록에 배경색</code></pre>
+				<h2>prose 본문도 Pretendard인지</h2>
+				<p>
+					한글과 English와 12345가 섞인 문장. 마크다운 렌더링 결과에도
+					<code>--font-sans</code>가 상속되는지 확인한다.
+				</p>
+				<blockquote>인용문 — 글자 폭과 행간이 읽기 좋게 잡히는지.</blockquote>
 			</article>
 		</main>
 	</body>

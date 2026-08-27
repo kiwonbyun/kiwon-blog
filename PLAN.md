@@ -78,6 +78,7 @@ git config는 `--local`로 설정하므로 전역 회사 설정에 영향이 없
 | Fonts API | stable(`fontProviders.*` + `<Font>`)이지만 **이번엔 쓰지 않는다** — 자체 `@font-face`를 생성해 dynamic subset의 unicode-range 분할과 충돌 |
 | Pretendard 패키지 | `pretendard@1.3.9`. `@fontsource/pretendard@5.3.0`도 있으나 variable 버전이 없어 미채택 |
 | dynamic subset 실측 | `dist/web/variable/pretendardvariable-dynamic-subset.css` = 56KB, `@font-face` 92개, woff2 92개 합계 **2.82MB** |
+| **전송량 실측 (3단계에서 측정)** | 한국어 기술 블로그 글 972자(고유 문자 243개) → **조각 12개 / 307KB**. 통짜 variable(2007KB) 대비 **15%**. 조각이 빈도순으로 나뉘어 있어 글이 길어져도 전송량이 거의 늘지 않는다(113자 테스트 페이지도 311KB로 사실상 동일) |
 | 폰트 CSS 내용 | `font-family: 'Pretendard Variable'`, `font-weight: 45 920`(가변), `font-display: swap` **이미 포함** |
 | Cloudflare 정적 배포 | **어댑터 불필요.** static output은 `dist/`를 그대로 올림 |
 
