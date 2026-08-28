@@ -2,12 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublishedPosts } from '../utils/posts';
+import { SITE_URL } from '../consts';
 
 const posts = await getPublishedPosts();
+const ogImage = new URL('/og/home.png', Astro.site ?? SITE_URL).href;
 ---
 
 {/* 홈은 글 목록만. 인트로·히어로를 두지 않기로 했다. */}
-<BaseLayout>
+<BaseLayout image={ogImage} imageWidth={1200} imageHeight={630}>
   <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6">
     {
       posts.length === 0 ? (

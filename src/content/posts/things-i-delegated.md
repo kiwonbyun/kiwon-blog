@@ -135,7 +135,6 @@ ai로 소스코드를 분석해 본 결과. 마이너 구버전에서 pending ui
 
 [https://github.com/TanStack/router/issues/1646](https://github.com/TanStack/router/issues/1646)
 
-
 내용을 분석해 보니 tanstack-router에서 loader기능을 제공합니다.
 
 이 목적은 SPA에서 네트워크를 사용할 때 네트워크 워터폴이 컴포넌트 렌더링 워터폴과 섞여서 전체적으로 느려지는 것을 방지하기 위해

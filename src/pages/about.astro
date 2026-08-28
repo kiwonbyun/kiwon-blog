@@ -1,9 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { GITHUB_URL } from '../consts';
+import { GITHUB_URL, SITE_URL } from '../consts';
+
+const ogImage = new URL('/og/about.png', Astro.site ?? SITE_URL).href;
 ---
 
-<BaseLayout title="About" description="이 블로그와 글쓴이에 대해">
+<BaseLayout
+  title="About"
+  description="이 블로그와 글쓴이에 대해"
+  image={ogImage}
+  imageWidth={1200}
+  imageHeight={630}
+>
   <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6 py-14">
     <header class="border-b border-rule pb-8">
       <p class="text-[0.6875rem] tracking-[0.18em] text-faint uppercase">About</p>

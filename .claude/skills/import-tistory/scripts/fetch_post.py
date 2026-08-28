@@ -65,6 +65,40 @@ def slice_body(html: str) -> str:
     raise SystemExit("본문 컨테이너를 찾지 못했습니다. 티스토리 스킨 구조를 확인하세요.")
 
 
+def strip_og_cards(html: str) -> str:
+    """티스토리가 URL 아래에 자동으로 붙이는 OG 링크 카드를 걷어낸다.
+
+    카드는 figure[data-og-*] 로 표시되고 내부에 제목·설명·도메인이 문단으로
+    들어있다. 이를 그대로 옮기면 마크다운에 아래처럼 남는다.
+
+        [
+        Functional Software Architecture
+        Functional core, imperative shell is a pattern that ...
+        functional-architecture.org
+        ](https://...)
+
+    글쓴이가 쓴 문장이 아니라 플랫폼이 만든 위젯이고, 같은 URL의 일반 링크가
+    바로 위에 이미 있어 중복이다. 게다가 설명은 외부 사이트의 OG 태그를 복사한
+    것이라 시간이 지나면 낡는다. 관련글 목록·툴바를 제외하는 것과 같은 이유로
+    본문에서 뺀다.
+    """
+    out: list[str] = []
+    pos = 0
+    for m in re.finditer(r"<figure\b([^>]*)>", html):
+        if "data-og-" not in m.group(1) or m.start() < pos:
+            continue
+        depth, end = 1, m.end()
+        for t in re.finditer(r"<(/?)figure\b[^>]*>", html[m.end() :]):
+            depth += -1 if t.group(1) else 1
+            if depth == 0:
+                end = m.end() + t.end()
+                break
+        out.append(html[pos : m.start()])
+        pos = end
+    out.append(html[pos:])
+    return "".join(out)
+
+
 class ToMarkdown(HTMLParser):
     """본문 HTML을 블록 단위 마크다운으로 옮긴다."""
 
@@ -348,6 +382,8 @@ def main() -> None:
 
     html = get(args.url).decode("utf-8", errors="replace")
     body = slice_body(html)
+    # 파서와 이미지 수집이 같은 입력을 보도록 여기서 한 번만 걷어낸다.
+    body = strip_og_cards(body)
     info = meta_of(html)
 
     # 이미지를 먼저 내려받는다. 티스토리 CDN URL에는 expires·signature가 붙어

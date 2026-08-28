@@ -4,6 +4,7 @@ import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import type { Post } from '../utils/posts';
+import { SITE_URL } from '../consts';
 
 interface Props {
   post: Post;
@@ -11,7 +12,17 @@ interface Props {
 }
 
 const { post, headings } = Astro.props;
-const { title, description, pubDate, updatedDate, tags } = post.data;
+const { title, description, pubDate, updatedDate, tags, cover } = post.data;
+
+/*
+ * 공유 카드 이미지.
+ *
+ * cover를 쓰지 않는다 — cover는 목록 썸네일로 고른 이미지라 OG 규격(1200x630)과
+ * 맞지 않고, Astro의 이미지 서비스는 원본보다 크게 확대하지 않아 작은 원본은
+ * 규격을 채울 수 없다. 대신 src/pages/og/ 에서 제목을 그린 카드를 빌드 때
+ * 생성하고 그 주소를 가리킨다. 이미지가 없는 글도 카드가 채워진다.
+ */
+const ogImage = new URL(`/og/posts/${post.id}.png`, Astro.site ?? SITE_URL).href;
 ---
 
 <BaseLayout
@@ -20,6 +31,10 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
   type="article"
   publishedDate={pubDate}
   updatedDate={updatedDate}
+  image={ogImage}
+  imageWidth={1200}
+  imageHeight={630}
+  imageAlt={title}
 >
   <article class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6 py-14">
     {/*
