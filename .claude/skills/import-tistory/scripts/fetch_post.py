@@ -12,7 +12,7 @@ verify.py로 확인한다.
 출력:
     <work-dir>/<slug>.raw.md       기계 변환된 본문. 편집 금지 (비교 기준)
     <work-dir>/<slug>.meta.json    제목·날짜·태그·이미지 목록·본문 지문
-    <posts-dir>/<slug>/image-N.*   내려받은 이미지
+    <posts-dir>/<slug>/image-N.webp  내려받아 WebP로 변환한 이미지
 
 작업 파일을 posts 디렉토리에 두지 않는 이유 — 컬렉션 로더가 **/*.md 를 훑기 때문에
 .raw.md도 글로 인식되고, frontmatter가 없어 빌드가 스키마 오류로 실패한다.
@@ -22,7 +22,10 @@ dev 서버가 떠 있으면 즉시 에러 화면이 뜬다.
 import argparse
 import json
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import unicodedata
 import urllib.request
 from html import unescape
@@ -355,6 +358,63 @@ def ext_of(url: str, blob: bytes) -> str:
     return "." + m.group(1).lower().replace("jpeg", "jpg") if m else ".png"
 
 
+def to_webp(blob: bytes, ext: str) -> tuple[bytes, str]:
+    """내려받은 이미지를 WebP로 바꾼다. 바꿀 수 없으면 원본을 그대로 돌려준다.
+
+    빌드 때도 Astro가 WebP를 만들지만 그건 dist 얘기고, git에 영구히 남는 것은
+    여기서 저장하는 소스다. 이미지는 이미 압축된 바이너리라 git의 delta 압축이
+    먹히지 않아 커밋된 크기가 히스토리에 그대로 쌓인다. 글이 쌓일수록 늘어나는
+    것은 dist가 아니라 이쪽이므로, 받는 시점에 줄여두는 것이 유일한 기회다.
+    (나중에 일괄 변환하면 옛 파일이 히스토리에 남아 오히려 레포가 2배가 된다.)
+
+    무손실과 손실(q85)을 둘 다 만들어 작은 쪽을 고른다. 평평한 UI 스크린샷은
+    무손실이 더 작으면서 글자도 뭉개지지 않고, 지도·사진은 손실이 압도적으로 작다.
+    다만 손실이 확실히 작을 때(무손실의 60% 이하)만 손실을 택한다 — 몇 KB 아끼려고
+    스크린샷 속 글자를 뭉개는 것은 손해이기 때문이다.
+    """
+    if ext == ".webp":
+        return blob, ext  # 이미 WebP. 다시 인코딩하면 화질만 깎인다
+
+    with tempfile.TemporaryDirectory() as td:
+        src = Path(td) / ("in" + ext)
+        src.write_bytes(blob)
+
+        # GIF는 cwebp가 애니메이션을 못 읽는다. gif2webp가 프레임을 보존한다.
+        if ext == ".gif":
+            out = Path(td) / "out.webp"
+            if not _run(["gif2webp", "-quiet", str(src), "-o", str(out)], out):
+                return blob, ext
+            return (out.read_bytes(), ".webp") if out.stat().st_size < len(blob) else (blob, ext)
+
+        lossless, lossy = Path(td) / "ll.webp", Path(td) / "ly.webp"
+        ok_ll = _run(["cwebp", "-quiet", "-lossless", "-z", "9", str(src), "-o", str(lossless)], lossless)
+        ok_ly = _run(["cwebp", "-quiet", "-q", "85", "-sharp_yuv", str(src), "-o", str(lossy)], lossy)
+        if not ok_ll and not ok_ly:
+            return blob, ext  # cwebp가 없거나 실패 — 원본을 그대로 쓴다
+
+        cands = []
+        if ok_ll:
+            cands.append((lossless.stat().st_size, lossless))
+        if ok_ly and ok_ll and lossy.stat().st_size * 100 // lossless.stat().st_size <= 60:
+            cands.append((lossy.stat().st_size, lossy))
+        elif ok_ly and not ok_ll:
+            cands.append((lossy.stat().st_size, lossy))
+
+        size, best = min(cands)
+        return (best.read_bytes(), ".webp") if size < len(blob) else (blob, ext)
+
+
+def _run(cmd: list[str], out: Path) -> bool:
+    """인코더를 돌리고 결과 파일이 실제로 생겼는지까지 확인한다."""
+    if shutil.which(cmd[0]) is None:
+        return False
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+    except Exception:  # noqa: BLE001
+        return False
+    return out.exists() and out.stat().st_size > 0
+
+
 def fingerprint(md: str) -> dict:
     """본문의 지문. verify.py가 내용 변경을 잡아낼 때 쓴다."""
     plain = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", md)   # 이미지 제거
@@ -390,6 +450,7 @@ def main() -> None:
     # 며칠 뒤 만료되므로, HTML을 받은 직후에 저장해두어야 한다.
     urls = image_urls(body)
     rel_paths, saved = [], []
+    downloaded_bytes = 0
     for i, u in enumerate(urls, 1):
         try:
             blob = get(u, referer=args.url)
@@ -397,7 +458,13 @@ def main() -> None:
             print(f"  ! 이미지 {i} 실패: {e}", file=sys.stderr)
             rel_paths.append("")
             continue
-        name = f"image-{i}{ext_of(u, blob)}"
+        downloaded_bytes += len(blob)
+        blob, ext = to_webp(blob, ext_of(u, blob))
+        if ext != ".webp":
+            # 원본으로 저장해도 글은 정상이지만 레포에 그만큼이 영구히 남는다.
+            # 눈에 띄어야 나중에 사람이 판단할 수 있으므로 조용히 넘기지 않는다.
+            print(f"  ! 이미지 {i}: WebP 변환 실패 — {ext} 원본으로 저장한다", file=sys.stderr)
+        name = f"image-{i}{ext}"
         (img_dir / name).write_bytes(blob)
         rel_paths.append(f"./{args.slug}/{name}")
         saved.append({"file": name, "bytes": len(blob), "source": u.split("?")[0]})
@@ -427,7 +494,9 @@ def main() -> None:
     print(f"작성일    : {info['published'] or '(찾지 못함)'}")
     print(f"태그      : {', '.join(info['tags']) or '(없음)'}")
     print(f"블록      : {meta['blocks']}개")
-    print(f"이미지    : {len(saved)}/{len(urls)}개 저장 → {img_dir}/")
+    stored_bytes = sum(x["bytes"] for x in saved)
+    shrink = f" ({downloaded_bytes // 1024}KB → {stored_bytes // 1024}KB WebP)" if saved else ""
+    print(f"이미지    : {len(saved)}/{len(urls)}개 저장{shrink} → {img_dir}/")
     print(f"본문 지문 : {meta['fingerprint']['chars_no_space']}자 / {meta['fingerprint']['sha256_prefix']}")
     print()
     print(f"기계 변환 결과 : {raw_path}   ← 편집하지 마세요 (비교 기준)")

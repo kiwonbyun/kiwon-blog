@@ -26,7 +26,11 @@ description: 티스토리 글 URL을 받아 문장을 하나도 바꾸지 않고
 
 ### 2. 가져온다
 
+이미지 변환에 `cwebp`·`gif2webp`가 필요하다. 없으면 원본 포맷 그대로 저장되고
+경고가 뜬다 — 작업이 멈추지는 않지만 레포에 원본 용량이 그대로 남는다.
+
 ```bash
+command -v cwebp || brew install webp
 python3 .claude/skills/import-tistory/scripts/fetch_post.py "<URL>" --slug <slug>
 ```
 
@@ -36,14 +40,15 @@ python3 .claude/skills/import-tistory/scripts/fetch_post.py "<URL>" --slug <slug
 | --- | --- |
 | `.import-tistory/<slug>.raw.md` | 기계 변환된 본문. **편집하지 않는다.** 비교 기준 |
 | `.import-tistory/<slug>.meta.json` | 제목·작성일·태그·이미지 목록 |
-| `src/content/posts/<slug>/image-N.png` | 내려받은 이미지 |
+| `src/content/posts/<slug>/image-N.webp` | 내려받아 WebP로 변환한 이미지 |
 
 **작업 파일이 `src/content/posts/` 밖에 있는 것은 의도된 것이다.** 컬렉션 로더가
 `**/*.md`를 훑기 때문에 `.raw.md`를 posts 안에 두면 그것도 글로 인식되고, frontmatter가
 없어 빌드가 스키마 오류로 실패한다. dev 서버가 떠 있으면 곧바로 에러 화면이 뜬다.
 `.import-tistory/`는 `.gitignore`에 등록되어 있다.
 
-출력에 `이미지 : 8/8개` 처럼 저장 결과가 나온다. **분모와 분자가 다르면 즉시 다시 실행한다.**
+출력에 `이미지 : 8/8개 저장 (1024KB → 210KB WebP)` 처럼 저장 결과가 나온다.
+**분모와 분자가 다르면 즉시 다시 실행한다.**
 티스토리 CDN 주소에는 `expires`·`signature`가 붙어 며칠 뒤 만료된다. 지금 실패한 이미지는
 나중에 같은 주소로 다시 받을 수 없고, 글 페이지를 새로 읽어 새 주소를 받아야 한다.
 
@@ -83,7 +88,7 @@ title: '<meta.json의 title>'
 description: '목록 카드와 검색 결과에 쓰일 한 줄'
 pubDate: <meta.json의 published 중 날짜 부분>
 tags: ['<주제>', '<주제>']
-cover: ./<slug>/image-1.png
+cover: ./<slug>/image-1.webp
 ---
 ```
 
@@ -138,8 +143,17 @@ nvm use && npm run build
 두면 마크다운이 공백으로 합쳐 원문의 줄나눔이 사라진다.
 
 **이미지가 많은 글** — 예전 글은 이미지를 적극적으로 쓴 경우가 많다. 이미지는 본문에서
-설명을 뒷받침하는 자리에 있으므로 위치를 옮기지 않는다. 빌드 때 WebP로 변환되고 화면
-크기별로 여러 벌이 만들어지므로 원본 용량은 신경 쓰지 않아도 된다.
+설명을 뒷받침하는 자리에 있으므로 위치를 옮기지 않는다.
+
+용량은 **받는 시점에** 처리한다. 빌드 때 Astro가 WebP를 만들어주지만 그건 `dist` 얘기이고,
+git에 영구히 남는 것은 `src`에 저장한 원본이다. 이미지는 이미 압축된 바이너리라 git의
+delta 압축이 먹히지 않아 커밋된 크기가 히스토리에 그대로 쌓인다. 그래서 스크립트가 내려받은
+직후 WebP로 바꿔 저장한다. 나중에 일괄 변환하면 옛 파일이 히스토리에 남아 레포가 오히려
+커지므로, 이 시점이 유일한 기회다.
+
+변환 방식은 이미지마다 다르다. 무손실과 손실(q85)을 둘 다 만들어 작은 쪽을 고르되, 손실이
+무손실의 60% 이하일 때만 손실을 택한다. 평평한 UI 스크린샷은 무손실이 더 작으면서 글자도
+안 뭉개지고, 지도·사진은 손실이 4~9배 작다. 애니메이션 GIF는 `gif2webp`가 프레임을 보존한다.
 
 **여러 글을 옮길 때** — 한 번에 하나씩 끝낸다. slug 지정, 구조화, 검증이 글마다 달라서
 묶어 처리하면 검증을 건너뛰기 쉽다. 사용자가 URL을 여러 개 주면 순서대로 하나씩 처리하고

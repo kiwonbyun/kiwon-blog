@@ -4,7 +4,7 @@ description: 'AI에 코드 생산을 위임하는 동안 나도 모르게 함께
 pubDate: 2026-08-12
 tags: ['성능', '캐시', 'react']
 draft: false
-cover: ./things-i-delegated/image-1.png
+cover: ./things-i-delegated/image-1.webp
 ---
 
 ai 덕분에 코드 생산에 미친듯한 속도로 달리다 보니  
@@ -17,7 +17,7 @@ ai 덕분에 코드 생산에 미친듯한 속도로 달리다 보니
 근데 어제는 분명히 304 응답받는 걸 봤는데 오늘은 모든 청크가 disk cache를 사용해서 네트워크 왕복 지연이 발생하지 않고 있었습니다. 관찰하는 시간에 따라 캐시 사용상태가 달랐습니다.  
 막연히 vite로 빌드하여 cache busting의 목적으로 정적파일에 해시값이 들어가서 배포된 파일은 유일하게 구분되어 캐싱된다고 알고 있었는데, 실제로 보니 간헐적으로 304와 캐시가 번갈아 적용되는 것 같았습니다.
 
-![](./things-i-delegated/image-1.png)
+![](./things-i-delegated/image-1.webp)
 
 헤더를 보니 위와 같은 상태였습니다.
 
@@ -50,13 +50,13 @@ HTTP는 가능한 한 많은 것들을 캐시 하도록 설계되어 있다고 �
 
 물론 이 경우는 아주 최악의 경우이고, 새로고침을 사용하면 chrome은 메인 리소스 요청 헤더에 cache-control max-age=0을 자동으로 부여하여 재검증합니다.
 
-![](./things-i-delegated/image-2.png)
+![](./things-i-delegated/image-2.webp)
 
 하지만 이것은 명백히 잘못된 상황이고 SPA로 작성된 웹은 index.html에 cache-control: no-cache를 사용하도록 권고됩니다.
 
 [no-cache, no-store](https://httpwg.org/specs/rfc9111.html#cache-response-directive.no-cache)는 다릅니다. 링크 참고해 주세요.
 
-![](./things-i-delegated/image-3.png)
+![](./things-i-delegated/image-3.webp)
 
 휴리스틱 캐시 시간을 계산해 보면 10일째 되어야 휴리스틱 캐시만으로 100% 커버리지에 도달합니다.
 
@@ -91,7 +91,7 @@ lcp, fcp까지 전부 최적화하고 js 압축하여 서빙하고 캐싱까지 
 
 모든 JS 청크가 캐시에 있었습니다. 그런데 메인 스레드는 500ms 동안 비어 있었습니다.
 
-![](./things-i-delegated/image-4.png)
+![](./things-i-delegated/image-4.webp)
 
 퍼포먼스 검사를 해봤습니다. 200ms~700ms까지 약 500ms의 공백이 있습니다. 메인스레드도 비어있습니다.
 
@@ -109,11 +109,11 @@ ga 같은 서드파티가 문제일까요?
 
 performance.mark로 측정해 봤으나 80ms정도에서 호출이 되었습니다.
 
-![](./things-i-delegated/image-5.png)
+![](./things-i-delegated/image-5.webp)
 
 알 수 없는 공백 후에 바로 실행되는 task를 보니 index-CXwtQn6.js임을 알 수 있습니다.
 
-![](./things-i-delegated/image-6.png)
+![](./things-i-delegated/image-6.webp)
 
 청크 다운로드 문제는 아님을 알 수 있습니다. 다른 원인이 딜레이 시키고 있습니다.
 
@@ -123,7 +123,7 @@ performance.mark로 측정해 봤으나 80ms정도에서 호출이 되었습니�
 
 main.js부터 랜딩페이지 route까지 실제로 찍히는 실행시점만 눈으로 확인해 보면 됩니다.
 
-![](./things-i-delegated/image-7.png)
+![](./things-i-delegated/image-7.webp)
 
 main.js, __root.js, route.js, index.js를 순차적으로 찍어보니 public route에서 500~501의 딜레이가 걸리고 있는 것을 찾았습니다.
 
@@ -159,7 +159,7 @@ defaultPendingMinMs: 0
 
 을 설정해도 문제없이 동작하지만 이것은 유용한 옵션이므로 pending ui를 정상적으로 사용하는 때에는 해당 옵션을 오버라이드 해줘야 하기 때문에 default 옵션을 건들지 않고 라이브러리 업데이트로 진행했습니다.
 
-![](./things-i-delegated/image-8.png)
+![](./things-i-delegated/image-8.webp)
 
 해결 후 랜딩페이지 Task가 즉시 실행됨을 확인할 수 있었습니다.
 

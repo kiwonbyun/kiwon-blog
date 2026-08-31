@@ -4,7 +4,7 @@ description: '클라이언트에서 복잡한 엔티티 관계를 직접 다루�
 pubDate: 2026-03-27
 tags: ['아키텍처', '리팩토링', 'react']
 draft: false
-cover: ./sqljs-functional-core/image-3.png
+cover: ./sqljs-functional-core/image-3.webp
 ---
 
 클라이언트에서 왜 DB를 사용했을까요?
@@ -29,7 +29,7 @@ cover: ./sqljs-functional-core/image-3.png
 
 정류장 마커의 삭제 버튼 클릭 핸들러에 모든 스토어를 다 끌어와야한다.
 
-![](./sqljs-functional-core/image-1.png)
+![](./sqljs-functional-core/image-1.webp)
 
 마커 컴포넌트의 삭제 버튼 핸들러만 300줄이 되었습니다.
 
@@ -340,7 +340,7 @@ syncReadModel 메서드는 각 스토어의 syncDB를 호출하기만 하면 됩
 
 구현한 아키텍쳐를 표현하면 아래와 같습니다.
 
-![](./sqljs-functional-core/image-3.png)
+![](./sqljs-functional-core/image-3.webp)
 
 이렇게 코드를 작성하니 관계형 db의 cascade, trigger를 충분히 활용하면서 정합성이나 참조무결성에 대해 신경쓰지 않아도 되어서
 

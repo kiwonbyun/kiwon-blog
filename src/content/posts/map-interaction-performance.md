@@ -4,14 +4,14 @@ description: '지도 권역에 hover할 때마다 스택을 막던 point-in-poly
 pubDate: 2025-05-27
 tags: ['성능', '알고리즘', '지도']
 draft: false
-cover: ./map-interaction-performance/image-1.png
+cover: ./map-interaction-performance/image-1.webp
 ---
 
 ## 문제발견: 느린 point-in-polygon 검사
 
 1. 문제발견: 느린 point-in-polygon 검사!
 
-![](./map-interaction-performance/image-1.png)
+![](./map-interaction-performance/image-1.webp)
 
 위와 같이 각 지역 권역 폴리곤 내부에 포함되는 마커의 개수를 출력하는 기능이 있다.
 
@@ -42,7 +42,7 @@ booleanPointInPolygon함수는 Ray-Casting 알고리즘을 사용하는 계산�
 
 그럼 적어도 Ray-Casting이란 게 뭔지 이해를 해야 한다.
 
-![](./map-interaction-performance/image-2.png)
+![](./map-interaction-performance/image-2.webp)
 
 한 점이 다각형 내부에 포함되는지 판단하는 방법은 점에서 한 방향으로 무한한 광선을 쏘았을 때 다각형 변을 지나치는 횟수가 짝수번이면 내부에 포함되지 않는다는 뜻이고, 홀수번이면 내부에 포함된다는 뜻이다.
 
@@ -111,7 +111,7 @@ booleanPointInPolygon을 호출하지 않는 방법은 없다. 다각형 내부�
 
 서울 권역에 포함된 점을 골라내고 싶다면 서울에 포함될 가능성이 있는 점들을 먼저 골라내고, 그 후보들을 대상으로 booleanPointInPolygon을 실행하면 된다. 포인트는 booleanPointInPolygon의 호출을 최대한 줄이는 것이다.
 
-![](./map-interaction-performance/image-3.png)
+![](./map-interaction-performance/image-3.webp)
 
 서울을 예로 들면 서울에 포함될 가능성이 있는 job을 선별하기 위해 다각형의 최대, 최소 x, y값으로 직사각형을 그려서 내부에 포함된 job을 먼저 선별하고 그 일부를 후보로 만들 수 있으면 계산 대상이 줄어들 것이다.
 
@@ -129,7 +129,7 @@ R-Tree는 지리적 좌표 같은 다차원 정보를 인덱싱 하는 트리라
 R-tree가 바로 이런 데이터를 알고리즘을 활용해서 "가까운 점끼리 묶는"인덱싱을 한다.  
 무엇을 가깝다고 판단하는가? => 이것은 다양한 알고리즘이 있는 것 같다. 개념을 이해하자면
 
-![](./map-interaction-performance/image-4.png)
+![](./map-interaction-performance/image-4.webp)
 
 위 이미지가 가장 쉬운 것 같다.  
 가깝게 위치한 점들을 묶어서 가장 작은 직사각형 MBR(Minimun Bounding Rectangle)부터 만들고 이것이 리프노드가 된다.  
