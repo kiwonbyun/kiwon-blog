@@ -2,20 +2,20 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublishedPosts } from '../utils/posts';
-import { SITE_URL } from '../consts';
+import { SITE_URL, LISTING_WIDTH } from '../consts';
 
 const posts = await getPublishedPosts();
-const ogImage = new URL('/og/home.png', Astro.site ?? SITE_URL).href;
+const ogImage = new URL('/og/home.jpg', Astro.site ?? SITE_URL).href;
 ---
 
 {/* 홈은 글 목록만. 인트로·히어로를 두지 않기로 했다. */}
-<BaseLayout image={ogImage} imageWidth={1200} imageHeight={630}>
-  <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6">
+<BaseLayout image={ogImage} imageWidth={1200} imageHeight={630} wide>
+  <main class:list={['mx-auto px-6', LISTING_WIDTH]}>
     {
       posts.length === 0 ? (
         <p class="py-20 text-muted">아직 글이 없습니다.</p>
       ) : (
-        <ul class="divide-y divide-rule">
+        <ul class="grid grid-cols-1 gap-5 py-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {posts.map((post) => (
             <li>
               <PostCard post={post} />

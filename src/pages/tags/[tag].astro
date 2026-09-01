@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getAllTags, getPublishedPosts, type Post } from '../../utils/posts';
+import { LISTING_WIDTH } from '../../consts';
 
 /*
  * 태그별 경로를 만든다.
@@ -35,15 +36,15 @@ interface Props {
 const { tag, posts } = Astro.props;
 ---
 
-<BaseLayout title={`#${tag}`} description={`${tag} 태그가 달린 글 ${posts.length}개`}>
-  <main class="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-5xl px-6">
+<BaseLayout title={`#${tag}`} description={`${tag} 태그가 달린 글 ${posts.length}개`} wide>
+  <main class:list={['mx-auto px-6', LISTING_WIDTH]}>
     <header class="border-b border-rule pt-14 pb-8">
       <p class="text-[0.6875rem] tracking-[0.18em] text-faint uppercase">태그</p>
       <h1 class="mt-2.5 text-3xl font-bold tracking-tight">#{tag}</h1>
       <p class="mt-2 text-sm text-muted">글 {posts.length}개</p>
     </header>
 
-    <ul class="divide-y divide-rule">
+    <ul class="grid grid-cols-1 gap-5 py-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {
         posts.map((post) => (
           <li>

@@ -1,73 +1,66 @@
-import { OGImageRoute } from 'astro-og-canvas';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import type { APIRoute } from 'astro';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import sharp from 'sharp';
 import { getPublishedPosts } from '../../utils/posts';
 
 /*
- * 공유 카드 이미지를 빌드 타임에 그린다.
+ * 공유 카드 이미지를 빌드 타임에 만든다.
  *
- * 글의 cover를 쓰지 않고 카드를 직접 그리는 이유 —
- * cover는 목록 썸네일 용도로 고른 이미지라 OG 규격(1200x630, 1.91:1)과
- * 맞지 않는 경우가 많다. 세로로 긴 다이어그램은 중앙만 잘려 의미를 잃고,
- * 작은 스크린샷은 카드에서 뭉개진다. 게다가 이미지가 없는 글은 카드가 빈다.
+ * 하는 일은 하나뿐이다 — 글의 대표 이미지를 1200x630(1.91:1)으로 잘라 JPEG로
+ * 내보낸다. 제목·설명을 이미지에 그리지 않는 이유는 og:title·og:description이
+ * 이미 메타 태그로 나가고, 공유 카드를 그리는 쪽(슬랙·카톡·X 등)이 그 텍스트를
+ * 이미지 옆에 붙여주기 때문이다. 이미지에까지 그리면 같은 문장이 두 번 보인다.
  *
- * 제목을 크게 그린 카드는 링크만 봐도 무슨 글인지 알 수 있고 모든 글이
- * 같은 규격을 갖는다. cover는 목록 썸네일이라는 원래 역할로 남는다.
+ * Astro의 getImage()를 쓰지 않는 이유 — 이미지 서비스가 원본보다 크게 확대하지
+ * 않아서, 498x193 같은 작은 커버는 1200x630을 채우지 못하고 그대로 나온다
+ * (OG 최소 규격 600x315에도 못 미친다). sharp는 확대해준다.
+ *
+ * JPEG인 이유 — 커버는 전부 WebP인데 og:image의 WebP 지원은 플랫폼마다 다르다.
+ * 특히 카카오톡·페이스북 계열은 JPEG/PNG라야 확실하다.
  */
 
-const posts = await getPublishedPosts();
-
-/** 경로(키)가 그대로 /og/<키>.png 가 된다. */
-const pages: Record<string, { title: string; description: string }> = {
-  home: { title: SITE_TITLE, description: SITE_DESCRIPTION },
-  about: { title: 'About', description: '이 블로그와 글쓴이에 대해' },
-};
-
-for (const post of posts) {
-  pages[`posts/${post.id}`] = {
-    title: post.data.title,
-    description: post.data.description,
-  };
-}
+const POSTS_DIR = './src/content/posts';
+/** 커버가 없는 글·페이지가 쓸 기본 이미지. 목록 카드와 같은 것. */
+const DEFAULT_COVER = './src/assets/default-cover.webp';
 
 /*
- * 한글을 그리려면 폰트 파일을 직접 넘겨야 한다. woff2는 canvaskit이 읽지
- * 못하므로 pretendard 패키지가 함께 제공하는 otf를 쓴다.
- * (이미 devDependency로 있는 패키지라 새로 받을 것이 없다)
+ * 커버 이미지의 파일 경로.
+ *
+ * frontmatter의 cover는 스키마의 image()를 거치며 ImageMetadata로 바뀌어 있고,
+ * 거기에는 src(빌드 산출물 주소)와 크기뿐이라 원본 경로가 없다.
+ * 그래서 마크다운의 cover 줄을 직접 읽는다.
  */
-const FONT_DIR = './node_modules/pretendard/dist/public/static';
+function coverPath(id: string): string {
+  const md = readFileSync(path.join(POSTS_DIR, `${id}.md`), 'utf-8');
+  const found = md.match(/^cover:\s*(\S+)\s*$/m);
+  return found ? path.join(POSTS_DIR, found[1].replace(/^\.\//, '')) : DEFAULT_COVER;
+}
 
-export const { getStaticPaths, GET } = await OGImageRoute({
-  param: 'route',
-  pages,
-  getImageOptions: (_path, page: { title: string; description: string }) => ({
-    title: page.title,
-    description: page.description,
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
 
-    // 사이트의 종이색 배경. 카드가 어느 앱에 놓여도 사이트와 같은 인상을 준다.
-    bgGradient: [[253, 252, 250]],
+  return [
+    { params: { route: 'home.jpg' }, props: { source: DEFAULT_COVER } },
+    { params: { route: 'about.jpg' }, props: { source: DEFAULT_COVER } },
+    ...posts.map((post) => ({
+      params: { route: `posts/${post.id}.jpg` },
+      props: { source: coverPath(post.id) },
+    })),
+  ];
+}
 
-    // 좌측 굵은 선 — 에디토리얼 판면의 규칙선을 카드로 옮긴 것.
-    border: { color: [28, 25, 23], width: 24, side: 'inline-start' },
-    padding: 72,
+export const GET: APIRoute<{ source: string }> = async ({ props }) => {
+  const body = await sharp(props.source)
+    .resize(1200, 630, {
+      fit: 'cover',
+      // 'attention' — 잘라낼 때 가장자리가 아니라 눈에 띄는 영역을 남긴다.
+      // 커버 비율이 제각각이라(가로로 넓은 것부터 세로로 긴 것까지) 가운데를
+      // 기계적으로 자르면 의미 있는 부분이 빠지는 경우가 있다.
+      position: 'attention',
+    })
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
 
-    fonts: [`${FONT_DIR}/Pretendard-Bold.otf`, `${FONT_DIR}/Pretendard-Regular.otf`],
-    font: {
-      title: {
-        color: [28, 25, 23],
-        size: 64,
-        weight: 'Bold',
-        lineHeight: 1.3,
-        families: ['Pretendard'],
-      },
-      description: {
-        color: [107, 101, 96],
-        size: 30,
-        weight: 'Normal',
-        lineHeight: 1.5,
-        families: ['Pretendard'],
-      },
-    },
-
-    cacheDir: './node_modules/.astro-og-canvas',
-  }),
-});
+  return new Response(body, { headers: { 'Content-Type': 'image/jpeg' } });
+};

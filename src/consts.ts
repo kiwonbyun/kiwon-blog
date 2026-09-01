@@ -20,3 +20,19 @@ export const GITHUB_URL = 'https://github.com/kiwonbyun';
  * 않도록 고정한다. 이 값을 바꾸면 사이트 전체 날짜 표기가 함께 바뀐다.
  */
 export const TIME_ZONE = 'Asia/Seoul';
+
+/**
+ * 컨테이너 폭.
+ *
+ * 두 종류로 나뉜다. 글 본문은 한 줄이 너무 길면 다음 줄 첫 글자를 찾기 어려워
+ * 좁게 묶어두고, 카드 목록은 화면이 넓을수록 열을 늘려야 하므로 더 넓게 연다.
+ *
+ * 헤더·푸터가 이 값을 페이지에 맞춰 골라 쓰는 이유 — 한쪽만 넓히면 목록
+ * 페이지에서 로고보다 카드가 바깥으로 튀어나와 어긋나 보인다. 테두리는
+ * 원래 화면 전체를 가로지르므로 안쪽 정렬만 맞추면 된다.
+ *
+ * 클래스 문자열을 상수로 둬도 Tailwind가 이 파일을 훑어 유틸리티를 생성한다.
+ */
+export const READING_WIDTH = 'max-w-2xl lg:max-w-3xl xl:max-w-5xl';
+export const LISTING_WIDTH =
+  'max-w-2xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-[1440px]';

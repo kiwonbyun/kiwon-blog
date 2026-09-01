@@ -31,17 +31,48 @@
   --faint: #a8a29e; /* 더 약한 보조 텍스트 */
   --rule: #e7e5e4; /* 얇은 구분선 */
   --inline-code-bg: #f2f1ef;
+
+  /*
+   * 다크 팔레트의 원본 값. 아래 두 진입점(OS 설정 / 개발용 토글)이
+   * 이것을 참조한다. 색을 바꿀 일이 생기면 여기만 고치면 된다.
+   */
+  --dark-paper: #191817;
+  --dark-ink: #f0efec;
+  --dark-muted: #a8a29e;
+  --dark-faint: #78716c;
+  --dark-rule: #2b2927;
+  --dark-inline-code-bg: #262422;
 }
 
+/*
+ * 다크모드 진입점은 둘이다.
+ *
+ * 1) OS 설정 — 평소 동작. 방문자에게 적용되는 것은 이쪽뿐이다.
+ *    :not([data-theme='light'])를 붙인 이유는 개발용 토글로 라이트를
+ *    강제했을 때 OS가 다크여도 라이트가 유지되게 하기 위해서다.
+ *
+ * 2) data-theme='dark' — 개발용 토글 전용. 미디어쿼리와 속성 선택자는
+ *    한 규칙으로 묶을 수 없어 블록이 나뉘지만, 값은 위 --dark-*를
+ *    참조하므로 두 진입점이 어긋날 일은 없다.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #191817;
-    --ink: #f0efec;
-    --muted: #a8a29e;
-    --faint: #78716c;
-    --rule: #2b2927;
-    --inline-code-bg: #262422;
+  :root:not([data-theme='light']) {
+    --paper: var(--dark-paper);
+    --ink: var(--dark-ink);
+    --muted: var(--dark-muted);
+    --faint: var(--dark-faint);
+    --rule: var(--dark-rule);
+    --inline-code-bg: var(--dark-inline-code-bg);
   }
+}
+
+:root[data-theme='dark'] {
+  --paper: var(--dark-paper);
+  --ink: var(--dark-ink);
+  --muted: var(--dark-muted);
+  --faint: var(--dark-faint);
+  --rule: var(--dark-rule);
+  --inline-code-bg: var(--dark-inline-code-bg);
 }
 
 /*
@@ -175,9 +206,16 @@
  * 선택자 명시도로는 이길 수 없다.
  */
 @media (prefers-color-scheme: dark) {
-  .astro-code,
-  .astro-code span {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
     color: var(--shiki-dark) !important;
     background-color: var(--shiki-dark-bg) !important;
   }
+}
+
+/* 개발용 토글. 코드블록도 같이 넘어가지 않으면 반쪽만 다크가 된다. */
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
 }

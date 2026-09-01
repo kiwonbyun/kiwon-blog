@@ -1,12 +1,23 @@
 ---
-import { AUTHOR, GITHUB_URL } from '../consts';
+import { AUTHOR, GITHUB_URL, READING_WIDTH, LISTING_WIDTH } from '../consts';
+
+interface Props {
+  wide?: boolean;
+}
+
+const { wide = false } = Astro.props;
 
 // 빌드 시점의 연도. 정적 사이트라 배포할 때 고정된다.
 const year = new Date().getFullYear();
 ---
 
 <footer class="mt-24 border-t border-rule">
-  <div class="mx-auto flex max-w-2xl lg:max-w-3xl xl:max-w-5xl items-baseline justify-between px-6 py-8 text-xs text-faint">
+  <div
+    class:list={[
+      'mx-auto flex items-baseline justify-between px-6 py-8 text-xs text-faint',
+      wide ? LISTING_WIDTH : READING_WIDTH,
+    ]}
+  >
     <p>&copy; {year} {AUTHOR}</p>
 
     <a

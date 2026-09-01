@@ -1,0 +1,62 @@
+---
+/*
+ * 개발용 테마 전환 버튼.
+ *
+ * 방문자용 기능이 아니다. 방문자에게는 OS 설정(prefers-color-scheme)이 그대로
+ * 적용되고, 이 버튼은 두 모드를 눈으로 번갈아 확인하기 위한 개발 도구다.
+ * BaseLayout이 import.meta.env.DEV일 때만 렌더하므로 프로덕션 빌드에는
+ * 마크업도 스크립트도 나가지 않는다 (이 사이트의 JS 0바이트는 지켜야 한다).
+ *
+ * 상태가 셋인 이유 — OS / 라이트 / 다크를 돌아가며 누른다. 라이트·다크만
+ * 있으면 "OS 설정을 따를 때 실제로 어떻게 보이는지"를 다시 확인할 방법이
+ * 없어진다. 방문자가 보는 것은 결국 OS 상태이므로 그 자리로 돌아올 수 있어야 한다.
+ */
+---
+
+<button
+  id="dev-theme-toggle"
+  type="button"
+  class="fixed right-4 bottom-4 z-50 rounded-full border border-rule bg-paper px-3.5 py-2 font-sans text-xs text-muted shadow-lg transition-colors hover:text-ink"
+>
+  <span data-label>테마</span>
+</button>
+
+<script>
+  const KEY = 'dev-theme';
+  /** 누를 때마다 이 순서로 돈다. null은 "고정하지 않음"(OS 설정을 따름). */
+  const CYCLE = [null, 'light', 'dark'] as const;
+
+  const root = document.documentElement;
+  const button = document.getElementById('dev-theme-toggle');
+  const label = button?.querySelector('[data-label]');
+
+  if (button && label) {
+    const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const forced = () => root.dataset.theme ?? null;
+
+    const render = () => {
+      const pinned = forced();
+      const effective = pinned ?? (systemIsDark.matches ? 'dark' : 'light');
+      const name = effective === 'dark' ? '다크' : '라이트';
+      label.textContent = pinned ? `${name} · 고정` : `${name} · OS`;
+    };
+
+    button.addEventListener('click', () => {
+      const next = CYCLE[(CYCLE.indexOf(forced() as never) + 1) % CYCLE.length];
+      if (next) {
+        root.dataset.theme = next;
+        localStorage.setItem(KEY, next);
+      } else {
+        delete root.dataset.theme;
+        localStorage.removeItem(KEY);
+      }
+      render();
+    });
+
+    // 고정하지 않은 상태에서 OS 설정이 바뀌면 라벨도 따라가야 한다.
+    systemIsDark.addEventListener('change', render);
+
+    render();
+  }
+</script>

@@ -9,6 +9,7 @@ import '../styles/global.css';
 
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
 import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
 
 interface Props {
@@ -29,6 +30,8 @@ interface Props {
   imageWidth?: number;
   imageHeight?: number;
   imageAlt?: string;
+  /** 카드 목록 페이지. 헤더·푸터를 본문 폭에 맞춰 넓힌다. */
+  wide?: boolean;
 }
 
 const {
@@ -41,6 +44,7 @@ const {
   imageWidth,
   imageHeight,
   imageAlt,
+  wide = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
@@ -58,6 +62,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE_URL);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    {
+      import.meta.env.DEV && (
+        <script is:inline>
+          {`const t = localStorage.getItem('dev-theme'); if (t) document.documentElement.dataset.theme = t;`}
+        </script>
+      )
+    }
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
@@ -103,10 +114,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE_URL);
   </head>
 
   <body class="flex min-h-screen flex-col bg-paper text-ink antialiased">
-    <Header />
+    <Header wide={wide} />
     <div class="flex-1">
       <slot />
     </div>
-    <Footer />
+    <Footer wide={wide} />
+    {import.meta.env.DEV && <ThemeToggle />}
   </body>
 </html>
